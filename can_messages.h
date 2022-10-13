@@ -59,7 +59,7 @@
  * ```
  */
 #define CAN_MESSAGE(commandName, fields) \
-typedef struct \
+typedef PACKED_STRUCT \
 fields \
 commandName; \
 VALIDATE_CAN_MESSAGE(commandName);
