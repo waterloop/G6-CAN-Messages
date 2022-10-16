@@ -95,6 +95,19 @@ CAN_MESSAGE(relayFaultDetected, {
     uint8_t errorCode;
 });
 
+//=========================================
+//            Begin Message Ids
+//=========================================
+enum CanMessageId : uint32_t {
+    RelayFaultDetected      = 0x00,
+    BmsFaultDetected        = 0x01,
+    McFaultDetected         = 0x02,
+    LVSensingFaultDetected  = 0x03,
+
+
+    // TODO Fill out with the rest of the values
+    DefaultRx = 0x7FFFFFF,
+};
 
 #ifdef __cplusplus
 }
