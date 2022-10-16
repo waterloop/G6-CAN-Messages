@@ -10,7 +10,22 @@
 #define _impl_CASSERT_LINE(predicate, line, descriptor) \
     typedef char _impl_PASTE(assertion_failed_##descriptor##_,line)[2*!!(predicate)-1];
 
-#define VALIDATE_CAN_MESSAGE(canMessage) _impl_CASSERT_LINE((sizeof(canMessage) <= MAX_CAN_MSG_SIZE),__LINE__,canMessage)
+/**
+ * @brief A Can Message must be one of the following lengths
+ * If it is 13 bytes for example, an addition byte array should be added
+ * called "unused" such that the size of the struct becomes 16.
+ */
+#define VALID_CAN_LENGTHS(messageSize) (((messageSize >= 0) \
+&& (messageSize <= 8)) \
+|| (messageSize == 12) \
+|| (messageSize == 16) \
+|| (messageSize == 20) \
+|| (messageSize == 24) \
+|| (messageSize == 32) \
+|| (messageSize == 48) \
+|| (messageSize == 64))
+
+#define VALIDATE_CAN_MESSAGE(canMessage) _impl_CASSERT_LINE(VALID_CAN_LENGTHS(sizeof(canMessage)),__LINE__,canMessage)
 #define PACKED_STRUCT struct __attribute__((packed))
 
 /**
