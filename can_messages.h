@@ -8,7 +8,7 @@
 #define MAX_CAN_MSG_SIZE 64
 #define _impl_PASTE(a,b) a##b
 #define _impl_CASSERT_LINE(predicate, line, descriptor) \
-    typedef char _impl_PASTE(assertion_failed_##descriptor##_,line)[2*!!(predicate)-1];
+    typedef char _impl_PASTE(assertion_failed_##descriptor##_unexpected_msg_size_##_,line)[2*!!(predicate)-1];
 
 /**
  * @brief A Can Message must be one of the following lengths
@@ -29,7 +29,7 @@
 #define PACKED_STRUCT struct __attribute__((packed))
 
 /**
- * @brief CAN_MESSAGE The CAN_MESSAGE macro
+ * @brief CAN_MESSAGE_STRUCT
  * is used to define can message structs. We use
  * This macro because it automatically includes a VALIDATE_CAN_MESSAGE call after defining the struct.
  * This allows us to validate at compile time that the message does not exceed the maximum size limits
@@ -73,7 +73,7 @@
  * typedef char assertion_failed_exampleCommand_<line number>[2*!!(sizeof(exampleCommand) <= MAX_CAN_MESSAGE_SIZE) - 1]
  * ```
  */
-#define CAN_MESSAGE(commandName, fields) \
+#define CAN_MESSAGE_STRUCT(commandName, fields) \
 typedef PACKED_STRUCT \
 fields \
 commandName; \
@@ -90,24 +90,38 @@ extern "C" {
 //=========================================
 //              BEGIN MESSAGES
 //=========================================
-
-CAN_MESSAGE(relayFaultDetected, {
-    uint8_t errorCode;
-});
+#define Messages \
+    CAN_MESSAGE(RelayFaultDetected, 0x00, { \
+        uint8_t errorCode;\
+    }) \
+    CAN_MESSAGE(BmsFaultDetected, 0x01, { \
+        uint8_t errorCode;\
+    }) \
+    CAN_MESSAGE(McFaultDetected, 0x02, {\
+        uint8_t errorCode;\
+    }) \
+    CAN_MESSAGE(LVSensingFaultDetected, 0x03, { \
+        uint8_t errorCode; \
+    })
 
 //=========================================
-//            Begin Message Ids
+//            Generate Message Ids
 //=========================================
+#define CAN_MESSAGE(name, id, fields) name##Id = id,
 enum CanMessageId : uint32_t {
-    RelayFaultDetected      = 0x00,
-    BmsFaultDetected        = 0x01,
-    McFaultDetected         = 0x02,
-    LVSensingFaultDetected  = 0x03,
-
-
+    Messages
     // TODO Fill out with the rest of the values
     DefaultRx = 0x7FFFFFF,
 };
+#undef CAN_MESSAGE
+
+//=========================================
+//        Generate Message structs
+//=========================================
+#define CAN_MESSAGE(name, id, fields) CAN_MESSAGE_STRUCT(name##Message, fields);
+Messages
+#undef CAN_MESSAGE
+
 
 #ifdef __cplusplus
 }
