@@ -8,7 +8,7 @@
 #define MAX_CAN_MSG_SIZE 64
 #define _impl_PASTE(a,b) a##b
 #define _impl_CASSERT_LINE(predicate, line, descriptor) \
-    typedef char _impl_PASTE(assertion_failed_##descriptor##_,line)[2*!!(predicate)-1];
+    typedef char _impl_PASTE(assertion_failed_##descriptor##_unexpected_msg_size_##_,line)[2*!!(predicate)-1];
 
 /**
  * @brief A Can Message must be one of the following lengths
